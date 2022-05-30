@@ -6,19 +6,19 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import web.dao.UserDAO;
 import web.model.User;
+import web.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class UserController {
-    private UserDAO userdao;
+    private UserService userService;
 
     @Autowired
-    public UserController(UserDAO userdao) {
-        this.userdao = userdao;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/")
@@ -38,7 +38,7 @@ public class UserController {
 
     @GetMapping("/people")
     public String index(Model model) {
-        model.addAttribute("people", userdao.getAllUsers());
+        model.addAttribute("people", userService.getAllUsers());
         return "view/index";
     }
 
@@ -46,22 +46,22 @@ public class UserController {
     public String creat(@ModelAttribute("newUser") User user,
                         BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("people", userdao.getAllUsers());
+            model.addAttribute("people", userService.getAllUsers());
             return "view/index";
         }
-        userdao.saveUser(user);
+        userService.saveUser(user);
         return "redirect:/people";
     }
 
     @DeleteMapping("/people/{id}")
     public String deletePerson(@PathVariable("id") int id) {
-        userdao.removeUserById(id);
+        userService.removeUserById(id);
         return "redirect:/people";
     }
 
     @GetMapping("/people/{id}/edit")
     public String edit(@ModelAttribute("id") int id, Model model) {
-        model.addAttribute("user", userdao.getUserById(id));
+        model.addAttribute("user", userService.getUserById(id));
         return "view/edit";
     }
 
@@ -70,7 +70,7 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return "view/edit";
         }
-        userdao.updateUser(updateuser);
+        userService.updateUser(updateuser);
         return "redirect:/people";
     }
 }
